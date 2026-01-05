@@ -6,17 +6,17 @@ import numpy as np
 import pygame
 import numba as nb                     # JIT compilation
 
-# =================================================
+
 # USER CONFIGURATION
-# =================================================
+
 WIDTH, HEIGHT   = 900, 700            # window size (pixel)
 FPS             = 60
 MAX_ITER        = 1200               # iterations for smooth colour
 FADE_ALPHA      = 48                  # fade speed (larger → faster fade)
 
-# -------------------------------------------------
+
 # MAP / FAMILY DEFINITIONS (used only for UI)
-# -------------------------------------------------
+
 FAMILY_NAMES = ["quadratic", "cubic", "exponential", "rational"]
 FAMILY_ID    = {name: i for i, name in enumerate(FAMILY_NAMES)}   # string → int id
 
@@ -28,9 +28,9 @@ ESCAPE_RADIUS = {
     "rational":    2.0,
 }
 
-# -------------------------------------------------
-# PALETTE – smooth HSV rainbow (256 colours)
-# -------------------------------------------------
+
+# PALETTE - smooth HSV rainbow (256 colours)
+
 def make_palette(num=256):
     """Return a (num,3) uint8 array with a smooth HSV rainbow."""
     pal = np.empty((num, 3), dtype=np.uint8)
@@ -40,14 +40,14 @@ def make_palette(num=256):
         pal[i] = (int(r * 255), int(g * 255), int(b * 255))
     return pal
 
-PALETTE = make_palette(256)            # global – read‑only, Numba can use it
+PALETTE = make_palette(256)            # global - read-only, Numba can use it
 
-# =================================================
-# NUMBA‑JIT core – fast pixel‑wise iteration
-# =================================================
+
+# NUMBA-JIT core - fast pixel-wise iteration
+
 @nb.njit(parallel=True, fastmath=True)
 def _iterate_fractal(width, height,
-                    xs, ys,                     # 1‑D coordinate vectors (float32)
+                    xs, ys,                     # 1-D coordinate vectors (float32)
                     c_real, c_imag,             # constant parameter (Julia) or ignored (Mandelbrot)
                     max_iter, escape_r,
                     mandelbrot, family_id):
@@ -57,7 +57,7 @@ def _iterate_fractal(width, height,
     """
     img = np.empty((height, width, 3), dtype=np.uint8)
 
-    # pre‑compute log(escape_r) and log(2) because they are constant
+    # pre-compute log(escape_r) and log(2) because they are constant
     log_escape = np.log(escape_r)
     log2       = np.log(2.0)
 
@@ -78,9 +78,9 @@ def _iterate_fractal(width, height,
             escaped = False
             it = max_iter
             for i in range(max_iter):
-                # -----------------------------------------------------------------
-                # family switch (minimal branches – Numba can optimise them away)
-                # -----------------------------------------------------------------
+               
+                # family switch (minimal branches - Numba can optimise them away)
+            
                 if family_id == 0:                      # quadratic  z = z*z + c
                     z = z * z + c
                 elif family_id == 1:                    # cubic      z = z*z*z + c
@@ -124,23 +124,23 @@ def _iterate_fractal(width, height,
 
     return img
 
-# =================================================
+
 # PYGAME INITIALISATION
-# =================================================
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Holomorphic‑Dynamics Explorer (Numba‑accelerated)")
+pygame.display.set_caption("Holomorphic-Dynamics Explorer (Numba-accelerated)")
 clock = pygame.time.Clock()
 fade_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
 font = pygame.font.SysFont(None, 20)          # UI text
 small_font = pygame.font.SysFont(None, 12)    # not used yet
 
-# =================================================
-# UI – two horizontal sliders (real & imag part of c)
-# =================================================
+
+# UI - two horizontal sliders (real & imag part of c)
+
 class Slider:
-    """Horizontal slider – knob draggable with the mouse."""
+    """Horizontal slider - knob draggable with the mouse."""
     def __init__(self, x, y, w, min_val, max_val, val):
         self.rect = pygame.Rect(x, y, w, 6)      # the track
         self.min = min_val
@@ -165,9 +165,9 @@ class Slider:
         pygame.draw.circle(screen, (255, 80, 80), (int(knob_x), self.rect.y + 3), 7)
 
 
-# -------------------------------------------------
+
 # Create the two sliders (Re(c), Im(c))
-# -------------------------------------------------
+
 BASE_SLIDER_Y = HEIGHT - 80
 SLIDER_GAP   = 40
 sliders = [
@@ -176,9 +176,9 @@ sliders = [
 ]
 slider_names = ["Re(c)", "Im(c)"]
 
-# =================================================
+
 # GLOBAL STATE
-# =================================================
+
 family = "quadratic"                 # default family
 family_id = FAMILY_ID[family]
 escape_r = ESCAPE_RADIUS[family]
@@ -189,18 +189,18 @@ mandelbrot_mode = False
 fractal_surface = None               # pygame surface with the current picture
 needs_recompute = True               # flag set when parameters change
 
-# -------------------------------------------------
-# High‑quality fractal computation wrapper
-# -------------------------------------------------
+
+# High-quality fractal computation wrapper
+
 def compute_fractal():
-    """Re‑compute the whole picture and return a pygame.Surface."""
+    """Re-compute the whole picture and return a pygame.Surface."""
     global fractal_surface, width_array, height_array
 
-    # --- 1‑D coordinate vectors (float32) ---------------------------------------
+    # --- 1-D coordinate vectors (float32) ---------------------------------------
     xs = np.linspace(-2.0, 2.0, WIDTH,  dtype=np.float32)
     ys = np.linspace(-2.0, 2.0, HEIGHT, dtype=np.float32)
 
-    # --- call the JIT‑compiled kernel -------------------------------------------
+    # --- call the JIT-compiled kernel -
     img = _iterate_fractal(WIDTH, HEIGHT,
                            xs, ys,
                            float(c_param.real), float(c_param.imag),
@@ -211,30 +211,30 @@ def compute_fractal():
     surf = pygame.surfarray.make_surface(img.swapaxes(0, 1))
     return surf
 
-# =================================================
+
 # MAIN LOOP
-# =================================================
+
 running = True
 paused  = False
 
 while running:
     clock.tick(FPS)
 
-    # -------------------------------------------------
+    
     # EVENT HANDLING
-    # -------------------------------------------------
+    
     for ev in pygame.event.get():
         if ev.type == pygame.QUIT:
             running = False
 
         if ev.type == pygame.KEYDOWN:
-            # ----- quit / pause -------------------------------------------------
+            # ----- quit / pause -------
             if ev.key == pygame.K_ESCAPE:
                 running = False
             if ev.key == pygame.K_SPACE:
                 paused = not paused
 
-            # ----- family selection --------------------------------------------
+            # ----- family selection --
             if ev.key == pygame.K_1:
                 family = "quadratic"
             if ev.key == pygame.K_2:
@@ -249,12 +249,12 @@ while running:
                 escape_r  = ESCAPE_RADIUS[family]
                 needs_recompute = True
 
-            # ----- toggle Mandelbrot / Julia -------------------------------------
+            # ----- toggle Mandelbrot / Julia 
             if ev.key == pygame.K_5:
                 mandelbrot_mode = not mandelbrot_mode
                 needs_recompute = True
 
-            # ----- save screenshot ------------------------------------------------
+            # ----- save screenshot ------
             if ev.key == pygame.K_s:
                 fn = f"{family}_{'M' if mandelbrot_mode else 'J'}_" \
                      f"{c_param.real:.3f}_{c_param.imag:.3f}.png"
@@ -269,57 +269,57 @@ while running:
                 c_param = 0.0 + 0.0j
                 needs_recompute = True
 
-        # ----- sliders (always active – they simply have no effect in Mandelbrot) -----
+        # ----- sliders (always active - they simply have no effect in Mandelbrot) -----
         for s in sliders:
             if s.handle(ev):
                 needs_recompute = True
 
-    # -------------------------------------------------
+    
     # Update the complex constant `c` from the sliders (only in Julia mode)
-    # -------------------------------------------------
+    
     if not mandelbrot_mode:
         c_param = complex(sliders[0].val, sliders[1].val)
 
-    # -------------------------------------------------
-    # Re‑compute the fractal when needed (and not paused)
-    # -------------------------------------------------
+    
+    # Re-compute the fractal when needed (and not paused)
+    
     if needs_recompute and not paused:
         print("[INFO] computing fractal …")
         fractal_surface = compute_fractal()
         needs_recompute = False
         print("[INFO] done.")
 
-    # -------------------------------------------------
+    
     # DRAW
-    # -------------------------------------------------
-    # fading surface – gives a tiny trailing effect when you move sliders
+    
+    # fading surface - gives a tiny trailing effect when you move sliders
     fade_surface.fill((0, 0, 0, FADE_ALPHA))
     screen.blit(fade_surface, (0, 0))
 
     if fractal_surface:
         screen.blit(fractal_surface, (0, 0))
 
-    # UI – sliders
+    # UI - sliders
     for s, name in zip(sliders, slider_names):
         s.draw()
         txt = f"{name} = {s.val:.3f}"
         screen.blit(font.render(txt, True, (200, 200, 200)),
                     (s.rect.x, s.rect.y - 25))
 
-    # UI – mode / family info
+    # UI - mode / family info
     mode_txt = "Mandelbrot" if mandelbrot_mode else f"Julia (c = {c_param.real:.3f}+{c_param.imag:.3f}i)"
     screen.blit(font.render(f"Family: {family} | Mode: {mode_txt}",
                             True, (255, 255, 255)), (10, 10))
 
-    # UI – help line
-    help_msg = "1‑4: family | 5: toggle Mandelbrot/Julia | SPACE: pause | R: reset | S: screenshot"
+    # UI - help line
+    help_msg = "1-4: family | 5: toggle Mandelbrot/Julia | SPACE: pause | R: reset | S: screenshot"
     screen.blit(font.render(help_msg, True, (180, 180, 180)),
                 (10, HEIGHT - 30))
 
     pygame.display.flip()
 
-# -------------------------------------------------
-# CLEAN‑UP
-# -------------------------------------------------
+
+# CLEAN-UP
+
 pygame.quit()
 sys.exit()
