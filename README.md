@@ -47,5 +47,5 @@ Includes:
 
 ## Holomorphic‑Dynamics Explorer – high‑quality,
 `   papo.py`
-    pre‑computed picture + pygame UI, CPU‑only but
-    accelerated with Numba (32‑bit floats).
+    pre‑computed picture + pygame UI, 
+    CPU‑only but accelerated with Numba (32‑bit floats).
