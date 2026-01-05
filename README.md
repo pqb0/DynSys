@@ -7,9 +7,11 @@ The repository contains a file for live orbits of the map and allows the visuali
 
 The following are small descriptions of each file and their functionality:
 
-'graph_attract.py':
+
 
 ## Interactive Attractor Plotter
+`   graph_attract.py`:
+
    * asks for N (number of points)
    * lets the user choose a map from a menu
    * asks for map parameters (showing defaults)
@@ -18,9 +20,10 @@ The following are small descriptions of each file and their functionality:
   Dependencies: numpy, matplotlib
 
 
-'bifurcation.py':
+
 
 ## Attractor Plotting + Bifurcation Diagrams
+`   bifurcation.py`
 
   * All maps (Henon, Logistic, Ikeda, Duffing, …)
   * Interactive: choose N, map, parameters, then
@@ -30,17 +33,19 @@ The following are small descriptions of each file and their functionality:
   Dependencies: numpy, matplotlib
   Install with: pip install numpy matplotlib
 
-'active_dyn.py':
 
 ## Dynamical‑Systems Lab – full version with Duffing map
+`   active_dyn.py`
+
 Includes:
    Henon, Ikeda, Standard, Logistic,
    Lozi, DeJong (damped), Damped (variant of standard map),
    Skew‑tent, and the Duffing map 
 
 
-'papo.py'
+
 
 ## Holomorphic‑Dynamics Explorer – high‑quality,
+`   papo.py`
     pre‑computed picture + pygame UI, CPU‑only but
     accelerated with Numba (32‑bit floats).
